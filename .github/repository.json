@@ -1,0 +1,6 @@
+{
+  "name": "crm-bi",
+  "description": "悦客 CRM：PostgreSQL 驱动的客户经营、销售流程与 BI 分析平台 | Yueke CRM: PostgreSQL-powered customer operations, sales workflows and business intelligence.",
+  "topics": ["crm", "postgresql", "business-intelligence", "nodejs", "express", "echarts", "dashboard", "row-level-security", "sales-management"]
+}
+

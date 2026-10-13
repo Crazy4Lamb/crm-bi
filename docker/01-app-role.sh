@@ -1,0 +1,8 @@
+#!/bin/sh
+set -eu
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" \
+  -v app_user="$CRM_APP_USER" -v app_password="$CRM_APP_PASSWORD" <<'SQL'
+CREATE ROLE :"app_user" LOGIN PASSWORD :'app_password' NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOBYPASSRLS;
+GRANT CONNECT ON DATABASE :DBNAME TO :"app_user";
+SQL
+

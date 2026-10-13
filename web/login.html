@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>登录 · 悦客 CRM</title>
+<link rel="stylesheet" href="/css/app.css" />
+</head>
+<body>
+<div class="login-wrap">
+  <div class="login-left">
+    <div class="dots" aria-hidden="true"></div>
+    <div class="login-brand">悦客 CRM · 让增长发生</div>
+    <div class="login-slogan">
+      客户 / 线索 / 商机 / 合同 / 订单 一体化录入，报表与统计图自助设计，指标按 T+1 自动计算。<br/>
+      每个角色登录后看到的数据、卡片、报表与统计图各不相同。
+    </div>
+    <div class="login-feats">
+      <div class="login-feat"><b>驾驶舱</b>KPI 卡片 + 多维统计图，按角色自动装配</div>
+      <div class="login-feat"><b>CRM 录入</b>客户档案、线索池、商机、合同、订单</div>
+      <div class="login-feat"><b>报表引擎</b>自定义字段、分组、排序、总计、导出</div>
+      <div class="login-feat"><b>统计图设计</b>柱形/折线/热度/漏斗/雷达等 11 种图型</div>
+      <div class="login-feat"><b>T+1 指标</b>指标来源于报表数据，任务调度自动落库</div>
+      <div class="login-feat"><b>权限隔离</b>全部 / 本部门 / 仅本人 三档数据范围</div>
+    </div>
+  </div>
+  <div class="login-right">
+    <div class="login-box">
+      <h2>账号登录</h2>
+      <div class="sub">请使用下方演示账号登录，不同角色看到的内容不同</div>
+      <div class="field">
+        <label>用户名</label>
+        <input class="input" id="username" placeholder="请输入用户名" autocomplete="username" />
+      </div>
+      <div class="field">
+        <label>密码</label>
+        <input class="input" id="password" type="password" placeholder="请输入密码" autocomplete="current-password" />
+      </div>
+      <div id="err" class="err" style="display:none"></div>
+      <button class="btn primary" id="loginBtn" style="width:100%;justify-content:center;margin-top:6px;">登 录</button>
+      <div class="demo-accounts">
+        <div class="t">演示账号（点击自动填充）</div>
+        <div id="demos" class="sm muted">加载中…</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="/js/api.js"></script>
+<script>
+  // 生成多巴胺圆点装饰
+  (function () {
+    const d = document.querySelector('.login-left .dots');
+    if (d) for (let i = 0; i < 24; i++) d.appendChild(document.createElement('i'));
+  })();
+</script>
+<script>
+(async function () {
+  if (API.getToken()) {
+    try { await API.get('/api/auth/me'); location.href = '/index.html'; return; } catch (e) { API.setToken(null); }
+  }
+  const uEl = document.getElementById('username');
+  const pEl = document.getElementById('password');
+  const errEl = document.getElementById('err');
+  const btn = document.getElementById('loginBtn');
+
+  function showErr(msg) { errEl.style.display = 'block'; errEl.textContent = msg; }
+
+  async function login() {
+    errEl.style.display = 'none';
+    const username = uEl.value.trim();
+    const password = pEl.value;
+    if (!username || !password) return showErr('请输入用户名和密码');
+    btn.disabled = true; btn.textContent = '登录中…';
+    try {
+      const r = await API.post('/api/auth/login', { username, password });
+      API.setToken(r.data.token);
+      location.href = '/index.html';
+    } catch (e) {
+      showErr(e.message || '登录失败');
+    } finally {
+      btn.disabled = false; btn.textContent = '登 录';
+    }
+  }
+  btn.onclick = login;
+  document.addEventListener('keydown', (e) => { if (e.key === 'Enter') login(); });
+
+  try {
+    const r = await API.get('/api/auth/demo-accounts');
+    const scopeLabel = { all: '全部数据', dept: '本部门数据', self: '仅本人数据' };
+    document.getElementById('demos').innerHTML = r.data.map((a) => `
+      <div class="demo-item" data-u="${a.username}" data-p="${a.password}">
+        <div><div class="r">${a.real_name} · ${a.role_name}</div>
+        <div class="u">${a.username} / ${a.password} · ${a.dept || ''} · ${scopeLabel[a.data_scope] || a.data_scope}</div></div>
+        <div class="badge ${a.data_scope === 'all' ? '' : a.data_scope === 'dept' ? 'badge orange' : 'badge gray'}">${scopeLabel[a.data_scope] || ''}</div>
+      </div>`).join('');
+    document.querySelectorAll('.demo-item').forEach((el) => {
+      el.onclick = () => { uEl.value = el.dataset.u; pEl.value = el.dataset.p; login(); };
+    });
+    uEl.value = 'gm01'; pEl.value = '123456';
+  } catch (e) {
+    document.getElementById('demos').textContent = '演示账号加载失败：' + e.message;
+  }
+})();
+</script>
+</body>
+</html>

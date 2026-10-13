@@ -1,0 +1,28 @@
+{
+  "name": "crm-bi",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CRM + BI 分析平台：驾驶舱 / CRM 录入 / 报表设计 / 统计图设计 / T+1 指标 / 任务管理，权限按角色隔离",
+  "main": "server/index.js",
+  "type": "commonjs",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "initdb": "node server/db/init.js",
+    "setup": "node scripts/setup.js",
+    "db:up": "node scripts/setup.js --db-only",
+    "db:migrate": "node server/db/migrate.js",
+    "db:backup": "node scripts/backup.js",
+    "start": "node server/index.js",
+    "dev": "node server/index.js",
+    "test": "node scripts/smoke.js && node scripts/crmcheck.js",
+    "test:pg": "node scripts/pgcheck.js"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "^0.2.17",
+    "bcryptjs": "^2.4.3",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "node-cron": "^3.0.3",
+    "pg": "^8.13.1"
+  }
+}

@@ -1,0 +1,60 @@
+name: PostgreSQL regression
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: crm_owner
+          POSTGRES_PASSWORD: crm_ci_migration_only
+          POSTGRES_DB: crm_bi
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U crm_owner -d crm_bi"
+          --health-interval 3s
+          --health-timeout 3s
+          --health-retries 30
+    env:
+      DB_MODE: pg
+      PGHOST: 127.0.0.1
+      PGPORT: 5432
+      PGDATABASE: crm_bi
+      PGUSER: crm_app
+      PGPASSWORD: crm_ci_app_only
+      PGADMIN_USER: crm_owner
+      PGADMIN_PASSWORD: crm_ci_migration_only
+      JWT_SECRET: crm-ci-test-only-secret-at-least-32-characters
+      APP_TZ: Asia/Shanghai
+      BACKFILL_DAYS: 120
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: node scripts/create-app-role.js
+      - run: npm run initdb
+      - name: Start application
+        run: |
+          node server/index.js > server.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8787/api/health; then exit 0; fi
+            sleep 1
+          done
+          cat server.log
+          exit 1
+      - run: npm test
+      - run: npm run test:pg
+      - name: Verify initialization is non-destructive
+        run: npm run initdb
+
