@@ -1,0 +1,33 @@
+server:
+  port: ${PORT:8787}
+  compression:
+    enabled: true
+spring:
+  application:
+    name: crm-bi
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
+  datasource:
+    url: jdbc:postgresql://${PGHOST:127.0.0.1}:${PGPORT:5433}/${PGDATABASE:crm_bi}?ApplicationName=crm-bi-spring&options=-c%20timezone%3D${APP_TZ:Asia/Shanghai}
+    username: ${PGUSER:crm_app}
+    password: ${PGPASSWORD:}
+    hikari:
+      maximum-pool-size: ${PGPOOL_MAX:15}
+      minimum-idle: 2
+      connection-timeout: 5000
+      validation-timeout: 3000
+      idle-timeout: 30000
+      data-source-properties:
+        statement_timeout: ${PG_STATEMENT_TIMEOUT_MS:15000}
+        idle_in_transaction_session_timeout: 15000
+  jackson:
+    default-property-inclusion: non_null
+    time-zone: ${APP_TZ:Asia/Shanghai}
+  web:
+    resources:
+      cache:
+        period: 0
+app:
+  timezone: ${APP_TZ:Asia/Shanghai}
+  jwt-secret: ${JWT_SECRET:}
+  jwt-hours: 12

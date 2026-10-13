@@ -1,9 +1,8 @@
 {
   "name": "crm-bi",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
-  "description": "CRM + BI 分析平台：驾驶舱 / CRM 录入 / 报表设计 / 统计图设计 / T+1 指标 / 任务管理，权限按角色隔离",
-  "main": "server/index.js",
+  "description": "Spring Boot + PostgreSQL 18 CRM 与 BI 分析平台，支持客户全旅程、RLS 数据权限、报表、指标和驾驶舱",
   "type": "commonjs",
   "engines": { "node": ">=22" },
   "scripts": {
@@ -12,17 +11,15 @@
     "db:up": "node scripts/setup.js --db-only",
     "db:migrate": "node server/db/migrate.js",
     "db:backup": "node scripts/backup.js",
-    "start": "node server/index.js",
-    "dev": "node server/index.js",
+    "start": "docker compose up -d --build app",
+    "stop": "docker compose down",
+    "build": "docker build -t crm-bi:local .",
     "test": "node scripts/smoke.js && node scripts/crmcheck.js",
     "test:pg": "node scripts/pgcheck.js"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.2.17",
     "bcryptjs": "^2.4.3",
-    "express": "^4.19.2",
-    "jsonwebtoken": "^9.0.2",
-    "node-cron": "^3.0.3",
     "pg": "^8.13.1"
   }
 }

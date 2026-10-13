@@ -82,7 +82,7 @@ window.APP = (function () {
     const health = (await API.get('/api/health')).data;
     state.database = health.mode;
     state.timezone = health.timezone;
-    document.getElementById('dbBadge').textContent = health.mode === 'pg' ? '● PostgreSQL' : 'PGlite 演示';
+    document.getElementById('dbBadge').textContent = health.mode === 'pg' ? '● Spring Boot · PostgreSQL' : '演示模式';
   }
 
   async function route() {

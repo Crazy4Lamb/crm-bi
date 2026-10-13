@@ -114,7 +114,9 @@
       body.innerHTML = `
         <div class="card mb16"><div class="card-hd"><div><div class="t">数据库连接</div><div class="d">当前后端使用的数据库实例</div></div></div>
           <div class="card-bd">
-            <div class="kv"><span>数据库模式</span><b class="mono">${pg ? '真实 PostgreSQL 服务 / node-postgres 连接池' : 'PGlite 演示模式'}</b></div>
+            <div class="kv"><span>后端运行时</span><b class="mono">${pg && pg.backend ? `${UI.esc(pg.backend.framework)} / Java ${UI.esc(pg.backend.java)}` : UI.esc(stats.backend || '-')}</b></div>
+            <div class="kv"><span>数据访问</span><b class="mono">${pg && pg.backend ? UI.esc(pg.backend.dataAccess) : 'Spring JDBC + HikariCP'}</b></div>
+            <div class="kv"><span>数据库模式</span><b class="mono">${pg ? '真实 PostgreSQL 18 服务 / 行级安全' : '数据库未连接'}</b></div>
             <div class="kv"><span>连接信息</span><b class="mono">${UI.esc(stats.db.label)}</b></div>
             <div class="kv"><span>版本</span><b class="mono sm">${UI.esc(stats.db.version)}</b></div>
             <div class="kv"><span>数据库当前日期</span><b class="mono">${UI.esc(String(stats.today).slice(0, 10))}</b></div>

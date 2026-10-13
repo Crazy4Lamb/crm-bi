@@ -132,6 +132,8 @@ textarea.input { resize: vertical; min-height: 64px; }
 .badge.orange { background: #fff1d6; color: #d98a00; }
 .badge.pink { background: #ffe1ec; color: var(--pink); }
 .badge.purple { background: #ece0ff; color: var(--purple); }
+.badge.blue { background: #dff1ff; color: #1477a8; }
+.badge.yellow { background: #fff4bf; color: #987000; }
 .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--pink), var(--purple)); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12.5px; font-weight: 700; box-shadow: 0 3px 8px rgba(255, 77, 141, .30); }
 .content { flex: 1; overflow-y: auto; padding: 18px 20px 40px; }
 
@@ -379,6 +381,8 @@ table.tbl tbody tr:hover { background: #fffaf3; }
 .timeline-item { position: relative; padding: 0 0 22px; }
 .timeline-item::before { content: ''; position: absolute; left: -28px; top: 7px; width: 10px; height: 10px; background: #ad84e7; border-radius: 50%; box-shadow: 0 0 0 3px #f2eafa; }
 .timeline-item p { margin: 8px 0; white-space: pre-wrap; }
+.business-journey { max-height: 360px; overflow: auto; padding-right: 10px; }
+.business-journey .timeline-item::before { background: linear-gradient(135deg, #ff5fa2, #7c5cff 52%, #14c9c9); box-shadow: 0 0 0 4px rgba(124, 92, 255, .12); }
 :focus-visible { outline: 3px solid #985ce0; outline-offset: 3px; }
 @media (max-width: 1280px) { .hero-art { width: 270px; } .workflow { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); } .topbar .right { gap: 9px; } #dataDate { display: none; } }
 @media (max-width: 1000px) { .sidebar { width: 200px; } .content { padding: 20px; } .hero-art { min-width: 200px; width: 200px; transform: scale(.85); transform-origin: right center; } .workspace-hero { padding: 24px; } .topbar { padding: 14px 20px; } #whoami .muted { display: none; } }

@@ -1,4 +1,4 @@
-name: PostgreSQL regression
+name: Spring Boot + PostgreSQL regression
 on:
   push:
   pull_request:
@@ -41,12 +41,19 @@ jobs:
         with:
           node-version: '22'
           cache: npm
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
       - run: npm ci
       - run: node scripts/create-app-role.js
       - run: npm run initdb
+      - name: Build Spring Boot application
+        run: mvn -B package
       - name: Start application
         run: |
-          node server/index.js > server.log 2>&1 &
+          java -jar target/crm-bi-*.jar > server.log 2>&1 &
           for i in $(seq 1 30); do
             if curl -fsS http://127.0.0.1:8787/api/health; then exit 0; fi
             sleep 1

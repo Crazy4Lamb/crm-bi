@@ -15,6 +15,10 @@ function run(cmd, args) {
   if (result.error) throw result.error;
   if (result.status !== 0) process.exit(result.status || 1);
 }
-run('docker', ['compose', 'up', '-d', '--wait', '--wait-timeout', '180']);
-if (!process.argv.includes('--db-only')) run(process.execPath, ['server/db/init.js']);
+run('docker', ['compose', 'up', '-d', '--wait', '--wait-timeout', '180', 'db']);
+if (!process.argv.includes('--db-only')) {
+  run(process.execPath, ['server/db/init.js']);
+  run('docker', ['compose', 'up', '-d', '--build', '--wait', '--wait-timeout', '300', 'app']);
+  console.log('Yueke CRM is ready at http://127.0.0.1:8787');
+}
 

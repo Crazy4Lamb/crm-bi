@@ -75,6 +75,12 @@ async function main() {
     check('足额回款推进已付款状态', paid.status === 'paid' && Number(paid.paid_amount) === 100);
     check('回款记录可再次读取', (await call('rep01', 'payment?orderId=' + order)).data.rows.length === 2);
     check('回款列表不泄露其他销售数据', (await call('rep02', 'payment?orderId=' + order)).data.rows.length === 0);
+    const linked360 = (await call('rep01', 'customer/' + c1 + '/360')).data;
+    check('客户360联动订单与回款业务旅程',
+      linked360.journey.some((x) => x.event_type === 'order' && x.entity_id === order)
+      && linked360.journey.filter((x) => x.event_type === 'payment').length === 2);
+    check('客户360实时汇总已收与待收',
+      Number(linked360.summary.paidAmount) >= 100 && Number(linked360.summary.receivableAmount) >= 0);
     console.log(`CRM 回归通过 ${checks} 项`);
   } finally {
     for (const [kind, id] of fixtures.reverse()) {

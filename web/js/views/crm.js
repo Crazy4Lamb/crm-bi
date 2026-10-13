@@ -450,6 +450,14 @@
       const d = r.data;
       const c = d.customer;
       const tbl = (cols, rows) => rows.length ? UI.table(cols, rows) : '<div class="empty">暂无记录</div>';
+      const eventMeta = {
+        lead: ['线索', 'orange'], opportunity: ['商机', 'purple'], contract: ['合同', 'green'],
+        order: ['订单', 'blue'], payment: ['回款', 'pink'], followUp: ['跟进', 'yellow']
+      };
+      const journey = (d.journey || []).map((item) => {
+        const meta = eventMeta[item.event_type] || ['动态', 'purple'];
+        return `<article class="timeline-item journey-${UI.esc(item.event_type)}"><div><span class="badge ${meta[1]}">${meta[0]}</span> <b>${UI.esc(item.title)}</b><span class="sm muted"> · ${UI.dt(item.occurred_at)}</span></div><p>${UI.esc(item.detail || '')}</p></article>`;
+      }).join('');
       UI.modal({
         title: `客户 360 · ${c.name}（${c.cust_no}）`,
         size: 'xwide',
@@ -459,9 +467,13 @@
             <div class="stat-chip"><div class="l">合同数</div><div class="v">${d.summary.contractCnt}</div></div>
             <div class="stat-chip"><div class="l">订单金额</div><div class="v">${UI.money(d.summary.orderAmount)}</div></div>
             <div class="stat-chip"><div class="l">订单数</div><div class="v">${d.summary.orderCnt}</div></div>
+            <div class="stat-chip"><div class="l">累计回款</div><div class="v">${UI.money(d.summary.paidAmount)}</div></div>
+            <div class="stat-chip"><div class="l">待收款</div><div class="v">${UI.money(d.summary.receivableAmount)}</div></div>
             <div class="stat-chip"><div class="l">行业 / 区域</div><div class="v" style="font-size:14px">${UI.esc(c.industry || '-')} / ${UI.esc(c.region || '-')}</div></div>
           </div>
           <div class="mb12"><b>基本信息</b><div class="sm muted mt8">归属销售：${UI.esc(c.owner_name || '-')} · 等级：${UI.esc(c.level || '-')} · 来源：${UI.esc(c.source || '-')} · 电话：${UI.esc(c.phone || '-')} · 创建：${UI.dt(c.created_at)}</div></div>
+          <div class="mt16"><b>客户业务旅程（线索 → 商机 → 合同 → 订单 → 回款）</b><div class="sm muted mt8">来自 PostgreSQL 关联数据，按发生时间统一排序。</div></div>
+          <div class="timeline business-journey">${journey || '<div class="empty">暂无业务旅程记录</div>'}</div>
           <div class="mt16"><b>联系人（${d.contacts.length}）</b></div>
           ${tbl([{ key: 'name', name: '姓名' }, { key: 'position', name: '职位' }, { key: 'phone', name: '电话' }, { key: 'is_primary', name: '主联系人', render: (x) => x.is_primary ? '是' : '否' }], d.contacts)}
           <div class="mt16"><b>合同（${d.contracts.length}）</b></div>

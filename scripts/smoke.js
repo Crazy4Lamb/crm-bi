@@ -195,6 +195,10 @@ async function main() {
     const run = await call('/api/task/1/run', { method: 'POST', body: { statDate: '2026-10-12' } }, sessions.ana01.token);
     ok('手动执行 T+1 指标任务', run.data.data.ok && run.data.data.rows === 12, `写入 ${run.data.data.rows} 条，耗时 ${run.data.data.durationMs}ms`);
 
+    const margin = await call('/api/metric/12/values', { params: { from: '2026-10-12', to: '2026-10-12' } }, sessions.ana01.token);
+    const marginValue = Number(margin.data.data.values[0].value);
+    ok('指标任务按独立口径计算毛利率', marginValue >= 0 && marginValue <= 1, `毛利率 ${(marginValue * 100).toFixed(2)}%`);
+
     const logs = await call('/api/task/logs', { params: { limit: 5 } }, sessions.ana01.token);
     ok('任务执行日志', logs.data.data.length > 0 && logs.data.data[0].status === 'success', '最近日志 ' + logs.data.data[0].start_time);
   }
