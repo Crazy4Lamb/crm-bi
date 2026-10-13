@@ -1,6 +1,6 @@
 {
   "name": "crm-bi",
-  "description": "悦客 CRM：Spring Boot + PostgreSQL 18 驱动的客户经营、销售流程与 BI 分析平台 | Yueke CRM: Spring Boot and PostgreSQL powered CRM & BI.",
+  "description": "CRM BI: a Spring Boot and PostgreSQL 18 platform for customer operations, sales workflows, and business intelligence.",
   "topics": ["crm", "java", "spring-boot", "spring-security", "spring-jdbc", "postgresql", "business-intelligence", "echarts", "dashboard", "row-level-security", "sales-management"]
 }
 

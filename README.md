@@ -1,4 +1,4 @@
-# 悦客 CRM · Yueke CRM
+# CRM BI
 
 **Spring Boot 3.5 + Java 21 + PostgreSQL 18** 驱动的 CRM 与 BI 分析平台。系统把线索、客户、商机、合同、订单、回款和跟进串成客户全旅程，并通过角色驾驶舱、报表、指标和经营分析形成实时数据联动。
 
@@ -6,7 +6,7 @@ A **Spring Boot 3.5, Java 21 and PostgreSQL 18** CRM and business intelligence p
 
 [中文说明](README.zh-CN.md) · [English guide](README.en.md)
 
-![多巴胺配色角色驾驶舱](docs/screenshots/dashboard.jpg)
+![CRM BI dopamine dashboard](docs/screenshots/dashboard.png)
 
 ## 核心能力 / Highlights
 
@@ -89,9 +89,9 @@ Node.js is retained for database initialization and black-box integration tests.
 
 | 经营分析 / Business pulse | 商机阶段 / Opportunity board |
 | --- | --- |
-| ![经营脉搏](docs/screenshots/insights.jpg) | ![商机阶段](docs/screenshots/opportunities.jpg) |
+| ![统计图中心](docs/screenshots/analytics.png) | ![商机阶段](docs/screenshots/opportunities.png) |
 
-![PostgreSQL 运行诊断](docs/screenshots/postgresql.jpg)
+![指标设计](docs/screenshots/metric-design.png)
 
 ## References
 

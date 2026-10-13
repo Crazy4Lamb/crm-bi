@@ -19,6 +19,6 @@ run('docker', ['compose', 'up', '-d', '--wait', '--wait-timeout', '180', 'db']);
 if (!process.argv.includes('--db-only')) {
   run(process.execPath, ['server/db/init.js']);
   run('docker', ['compose', 'up', '-d', '--build', '--wait', '--wait-timeout', '300', 'app']);
-  console.log('Yueke CRM is ready at http://127.0.0.1:8787');
+  console.log('CRM BI is ready at http://127.0.0.1:8787');
 }
 

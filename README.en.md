@@ -1,8 +1,8 @@
-# Yueke CRM · Customer Operations and Business Intelligence
+# CRM BI · Customer Operations and Business Intelligence
 
 [Bilingual home](README.md) · [中文说明](README.zh-CN.md)
 
-Yueke CRM is a customer operations and business intelligence project built with **Java 21, Spring Boot 3.5, Spring Security, Spring JDBC, HikariCP, and PostgreSQL 18**. It connects acquisition, sales progression, contracting, orders, payments, customer service, and analytics through one business model.
+CRM BI is a customer operations and business intelligence project built with **Java 21, Spring Boot 3.5, Spring Security, Spring JDBC, HikariCP, and PostgreSQL 18**. It connects acquisition, sales progression, contracting, orders, payments, customer service, and analytics through one business model.
 
 ## Implemented features
 
@@ -82,6 +82,6 @@ compose.yaml          Spring Boot and PostgreSQL 18
 
 Node.js is limited to database setup, seed generation, and black-box regression tests. Spring Boot serves every runtime HTTP API.
 
-![Role dashboard](docs/screenshots/dashboard.jpg)
+![CRM BI role dashboard](docs/screenshots/dashboard.png)
 
-![PostgreSQL diagnostics](docs/screenshots/postgresql.jpg)
+![Metric designer](docs/screenshots/metric-design.png)

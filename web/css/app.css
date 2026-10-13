@@ -260,7 +260,7 @@ table.tbl tr.total td { background: #fff4e6; font-weight: 700; color: var(--prim
 .kv > span { color: var(--muted); flex: none; }
 .kv > b { font-weight: 600; text-align: right; word-break: break-all; }
 
-/* 悦客工作空间：鲜明的多巴胺色块，安静的内容阅读区。 */
+/* CRM BI workspace: vivid dopamine color blocks with a calm content area. */
 body { background: #faf8f4; }
 .sidebar { width: 236px; background: #fffdf9; }
 .sidebar .brand { display: flex; align-items: center; gap: 11px; padding: 26px 22px 22px; }

@@ -1,8 +1,8 @@
-# 悦客 CRM · 客户经营与 BI 分析平台
+# CRM BI · 客户经营与商业智能平台
 
 [双语首页](README.md) · [English guide](README.en.md)
 
-悦客 CRM 是一个使用 **Java 21、Spring Boot 3.5、Spring Security、Spring JDBC、HikariCP 和 PostgreSQL 18** 开发的客户经营与商业智能项目。它参考主流销售 CRM 的工作方式，把获客、销售推进、签约、订单、回款、客户服务和经营分析连接到同一套数据模型中。
+CRM BI 是一个使用 **Java 21、Spring Boot 3.5、Spring Security、Spring JDBC、HikariCP 和 PostgreSQL 18** 开发的客户经营与商业智能项目。它参考主流销售 CRM 的工作方式，把获客、销售推进、签约、订单、回款、客户服务和经营分析连接到同一套数据模型中。
 
 ## 已实现功能
 
@@ -82,6 +82,6 @@ compose.yaml          Spring Boot + PostgreSQL 18
 
 Node.js 只用于建库、种子数据和黑盒回归；运行时 HTTP API 全部由 Spring Boot 提供。
 
-![角色驾驶舱](docs/screenshots/dashboard.jpg)
+![CRM BI 角色驾驶舱](docs/screenshots/dashboard.png)
 
-![PostgreSQL 运行信息](docs/screenshots/postgresql.jpg)
+![指标设计](docs/screenshots/metric-design.png)
