@@ -15,7 +15,7 @@ A **Spring Boot 3.5, Java 21 and PostgreSQL 18** CRM and business intelligence p
 - 按系统管理员、总经理、销售总监、销售代表、分析师和客服装配菜单、卡片、图表与数据范围。
 - PostgreSQL RLS 在数据库层实施本人、部门、全部数据范围；Spring JDBC 在每个事务写入经过认证的业务上下文。
 - PostgreSQL 序列、PL/pgSQL、行锁、约束、触发器、JSONB 审计、GIN、物化视图和窗口函数参与真实业务处理。
-- 12 个 T+1 指标按各自口径计算，报表、图表、驾驶舱和任务日志使用同一套业务数据。
+- 12 个 T+1 指标按各自口径计算；定时任务使用 PostgreSQL system 数据范围、事务级 advisory lock，并支持单日计算、滚动补算和无删除的归档检查。
 - 多巴胺配色的原生 JavaScript + ECharts 前端，由 Spring Boot 作为静态资源和 API 一并发布。
 
 ## 架构 / Architecture
@@ -65,7 +65,7 @@ npm stop           # stop app and database containers
 npm run db:up      # start only PostgreSQL
 npm run db:migrate # apply checksummed migrations
 npm run db:backup  # create data/backups/*.dump with pg_dump -Fc
-npm test           # 62 smoke + 37 CRM workflow/permission checks
+npm test           # 66 smoke + 37 CRM workflow/permission checks
 npm run test:pg    # 31 PostgreSQL-specific checks
 ```
 
@@ -80,7 +80,7 @@ server/services/               Node-only initialization/backfill helpers
 scripts/                       Setup, backup and end-to-end regression scripts
 Dockerfile                     Java 21 multi-stage production image
 compose.yaml                   Spring Boot app + dedicated PostgreSQL 18
-.github/workflows/ci.yml       Java build and 130 integration checks
+.github/workflows/ci.yml       Java build and 134 integration checks
 ```
 
 Node.js is retained for database initialization and black-box integration tests. Runtime HTTP requests are served by Spring Boot; there is no Express server entry point.

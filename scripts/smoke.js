@@ -163,6 +163,17 @@ async function main() {
     const filt = await call('/api/report/run', { method: 'POST', body: { reportId: 18, filters: [{ fieldKey: 'status', op: 'eq', value: 'effective' }], size: 5 } }, sessions.ana01.token);
     ok('过滤条件（合同状态=生效）生效', filt.data.data.rows.length > 0 && filt.data.data.rows.every((r) => r.status === 'effective'), '返回 ' + filt.data.data.totalRows + ' 行');
 
+    const inFilt = await call('/api/report/run', { method: 'POST', body: { reportId: 18, filters: [{ fieldKey: 'status', op: 'in', value: ['effective', 'closed'] }], size: 20 } }, sessions.ana01.token);
+    ok('IN 多值过滤由参数绑定安全展开', inFilt.status === 200 && inFilt.data.data.rows.length > 0
+      && inFilt.data.data.rows.every((r) => ['effective', 'closed'].includes(r.status)),
+    '返回 ' + inFilt.data.data.totalRows + ' 行');
+
+    const sampleDate = String(detail.data.data.rows[0].sign_date).slice(0, 10);
+    const dateFilt = await call('/api/report/run', { method: 'POST', body: { reportId: 18, filters: [{ fieldKey: 'sign_date', op: 'between', value: sampleDate, value2: sampleDate }], size: 20 } }, sessions.ana01.token);
+    ok('日期区间过滤使用 PostgreSQL date 类型比较', dateFilt.status === 200 && dateFilt.data.data.rows.length > 0
+      && dateFilt.data.data.rows.every((r) => String(r.sign_date).slice(0, 10) === sampleDate),
+    sampleDate + ' 共 ' + dateFilt.data.data.totalRows + ' 行');
+
     const inj = await call('/api/report/run', { method: 'POST', body: { reportId: 2, filters: [{ fieldKey: "region' or 1=1 --", op: 'eq', value: 'x' }] } }, sessions.ana01.token);
     ok('注入式过滤字段被拒绝', inj.status !== 200 || inj.data.code !== 0, inj.data.message || '');
   }
@@ -194,6 +205,14 @@ async function main() {
 
     const run = await call('/api/task/1/run', { method: 'POST', body: { statDate: '2026-10-12' } }, sessions.ana01.token);
     ok('手动执行 T+1 指标任务', run.data.data.ok && run.data.data.rows === 12, `写入 ${run.data.data.rows} 条，耗时 ${run.data.data.durationMs}ms`);
+
+    const backfill = await call('/api/task/2/run', { method: 'POST' }, sessions.ana01.token);
+    ok('近 7 天补算逐日执行且使用系统数据范围', backfill.data.data.ok && backfill.data.data.rows === 84,
+      `7 天 × 12 指标 = ${backfill.data.data.rows} 条`);
+
+    const archive = await call('/api/task/3/run', { method: 'POST' }, sessions.ana01.token);
+    ok('归档校验执行统计刷新且不删除业务数据', archive.data.data.ok && archive.data.data.type === 'data_archive' && archive.data.data.rows >= 0,
+      `候选 ${archive.data.data.rows} 条`);
 
     const margin = await call('/api/metric/12/values', { params: { from: '2026-10-12', to: '2026-10-12' } }, sessions.ana01.token);
     const marginValue = Number(margin.data.data.values[0].value);

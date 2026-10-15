@@ -14,7 +14,7 @@ CRM BI is a customer operations and business intelligence project built with **J
 | Opportunities | List and full stage board, stage amounts, expected dates, overdue counts, and stage advancement |
 | Contracts, orders, payments | Contract value and cost, orders, partial payments, paid/receivable totals, and overpayment protection |
 | Self-service BI | Grouping, aggregation, formula fields, filters, pagination, export, and 11 ECharts chart types |
-| Metrics and jobs | 12 T+1 metrics with separate business formulas, 120-day backfill, manual recalculation, and logs |
+| Metrics and jobs | 12 T+1 metrics with separate formulas, 120-day history, scheduled daily runs, rolling backfills, archive checks, and logs |
 | Administration | Users, roles, ACL matrix, database version, pool, indexes, RLS, migrations, and query plans |
 
 The UI uses a dopamine-inspired orange, berry pink, mint, purple, blue, and yellow palette with narrow-screen navigation.
@@ -62,11 +62,11 @@ npm run db:backup  # create a pg_dump custom-format backup
 ## Validation
 
 ```sh
-npm test          # 62 smoke + 37 CRM workflow and permission checks
+npm test          # 66 smoke + 37 CRM workflow and permission checks
 npm run test:pg   # 31 PostgreSQL-specific checks
 ```
 
-The 130 checks cover Spring Boot HTTP APIs, ACLs, RLS, pool reuse, rollback, concurrent identifiers, atomic conversion, Customer 360 linkage, concurrent payments, independent metric formulas, materialized views, window functions, audit data, and real query plans. GitHub Actions repeats them with Java 21 and an isolated PostgreSQL 18 service.
+The 134 checks cover Spring Boot HTTP APIs, ACLs, RLS, pool reuse, rollback, concurrent identifiers, atomic conversion, Customer 360 linkage, concurrent payments, independent metric formulas, rolling backfills, multi-value and date filters, materialized views, window functions, audit data, and real query plans. GitHub Actions repeats them with Java 21 and an isolated PostgreSQL 18 service.
 
 ## Project layout
 

@@ -572,7 +572,7 @@ const DASHBOARDS = [
 // ============================================================ 任务
 const TASKS = [
   ['task_metric_daily', 'T+1 指标日计算', 'metric_calc', '0 30 1 * * *', 1, '{"all":true}', '每天 01:30 计算前一天全部启用指标，写入 bi_metric_value'],
-  ['task_metric_recalc', '指标补算（近 7 天）', 'metric_calc', '0 30 2 * * *', 7, '{"all":true}', '每天 02:30 重算近 7 天指标，修正迟到数据'],
+  ['task_metric_recalc', '指标补算（近 7 天）', 'metric_backfill', '0 30 2 * * *', 7, '{"all":true}', '每天 02:30 重算近 7 天指标，修正迟到数据'],
   ['task_archive', '历史数据归档校验', 'data_archive', '0 0 3 * * 0', 0, '{"keepMonths":24}', '每周日 03:00 校验历史数据完整性']
 ];
 

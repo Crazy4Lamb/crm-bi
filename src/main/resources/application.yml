@@ -27,7 +27,14 @@ spring:
     resources:
       cache:
         period: 0
+  task:
+    scheduling:
+      pool:
+        size: ${SCHEDULER_POOL_SIZE:4}
+      thread-name-prefix: crm-sched-
 app:
   timezone: ${APP_TZ:Asia/Shanghai}
   jwt-secret: ${JWT_SECRET:}
   jwt-hours: 12
+  scheduler:
+    enabled: ${SCHEDULER_ENABLED:true}
