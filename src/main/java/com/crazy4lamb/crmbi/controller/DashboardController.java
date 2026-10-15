@@ -166,7 +166,18 @@ public class DashboardController {
           "select * from bi_widget where code in (:codes)", Map.of("codes", list))) {
         String type = text(widget.get("widget_type"));
         if (acl.can(user, "card".equals(type) ? "card" : "chart", text(widget.get("code")))) {
-          out.add(render(widget));
+          try {
+            out.add(render(widget));
+          } catch (ApiException invalidWidget) {
+            // 单个组件配置异常不应拖垮整张驾驶舱，前端可在对应卡片上显示错误。
+            Map<String,Object> failed = new LinkedHashMap<>();
+            failed.put("code", widget.get("code"));
+            failed.put("name", widget.get("name"));
+            failed.put("widgetType", type);
+            failed.put("ok", false);
+            failed.put("error", invalidWidget.getMessage());
+            out.add(failed);
+          }
         }
       }
       return ok(out);
@@ -356,20 +367,29 @@ public class DashboardController {
     if (reportId != null) {
       Dataset dataset = engine.datasetOfReport(reportId);
       List<QueryEngine.Field> fields = engine.reportFields(reportId);
+      List<Map<String,Object>> seriesConfig = mapList(widget.get("series"));
+      String configuredMeasure = seriesConfig.isEmpty()
+          ? null : text(seriesConfig.getFirst().get("key"), null);
       QueryEngine.Field measure = fields.stream()
           .filter(field -> "measure".equals(field.role()))
+          .filter(field -> !notBlank(configuredMeasure) || configuredMeasure.equals(field.key()))
           .findFirst().orElse(null);
-      String dateKey = notBlank(dataset.dateField()) ? dataset.dateField() : null;
+      boolean dateMapped = fields.stream()
+          .anyMatch(field -> dataset.dateField() != null && dataset.dateField().equals(field.key()));
+      String dateKey = dateMapped ? dataset.dateField() : null;
+      List<Filter> configuredFilters = widgetFilters(widget);
 
       if (measure != null) {
         String sumMode = text(widget.get("sum_mode"), "latest");
-        List<Series> series = List.of(new Series(measure.key(), measure.agg(), null, null));
+        String configuredAgg = seriesConfig.isEmpty()
+            ? measure.agg() : text(seriesConfig.getFirst().get("agg"), measure.agg());
+        List<Series> series = List.of(new Series(measure.key(), configuredAgg, null, null));
         LocalDate today = LocalDate.now();
 
         if ("latest".equals(sumMode) && dateKey != null) {
           // 取最近一个有数据的统计日
           Result latest = engine.queryReport(reportId, new Request(
-              dataset.id(), List.of(dateKey), series, List.of(),
+              dataset.id(), List.of(dateKey), series, configuredFilters,
               null, dateKey, "desc", 1, false));
           if (!latest.rows().isEmpty()) {
             Map<String,Object> row = latest.rows().getFirst();
@@ -377,7 +397,7 @@ public class DashboardController {
             statDate = String.valueOf(row.get(dateKey));
           }
         } else {
-          List<Filter> filters = new ArrayList<>();
+          List<Filter> filters = new ArrayList<>(configuredFilters);
           if ("mtd".equals(sumMode) && dateKey != null) {
             filters.add(new Filter(dateKey, "ge", today.withDayOfMonth(1).toString(), null));
           }
@@ -388,7 +408,7 @@ public class DashboardController {
           }
           if (dateKey != null) {
             Result newest = engine.queryReport(reportId, new Request(
-                dataset.id(), List.of(dateKey), List.of(), List.of(),
+                dataset.id(), List.of(dateKey), List.of(), configuredFilters,
                 null, dateKey, "desc", 1, false));
             if (!newest.rows().isEmpty()) {
               statDate = String.valueOf(newest.rows().getFirst().get(dateKey));
@@ -400,7 +420,8 @@ public class DashboardController {
         if (dateKey != null) {
           Result trend = engine.queryReport(reportId, new Request(
               dataset.id(), List.of(dateKey), series,
-              List.of(new Filter(dateKey, "ge", today.minusDays(20).toString(), null)),
+              concatFilters(configuredFilters,
+                  new Filter(dateKey, "ge", today.minusDays(20).toString(), null)),
               "axis", null, null, 14, false));
           spark = trend.rows().reversed().stream()
               .map(row -> row.get(measure.key()))
@@ -479,13 +500,7 @@ public class DashboardController {
       throw ApiException.bad("统计图未配置维度或系列");
     }
 
-    List<Filter> filters = new ArrayList<>();
-    for (Map<String,Object> item : mapList(widget.get("filters"))) {
-      filters.add(new Filter(
-          text(item.get("key")), text(item.get("op"), "eq"),
-          QueryEngine.resolveValue(item.get("value")),
-          QueryEngine.resolveValue(item.get("value2"))));
-    }
+    List<Filter> filters = widgetFilters(widget);
 
     Integer limit = integer(widget.get("limit_rows"));
     Request request = new Request(
@@ -493,6 +508,26 @@ public class DashboardController {
         text(widget.get("sort_strategy"), null), null, null,
         limit == null || limit <= 0 ? 200 : Math.min(limit, 500), false);
     return engine.queryReport(reportId, request);
+  }
+
+  /** 把组件 JSON 中的过滤条件转换为查询引擎模型。 */
+  private static List<Filter> widgetFilters(Map<String,Object> widget) {
+    List<Filter> filters = new ArrayList<>();
+    for (Map<String,Object> item : mapList(widget.get("filters"))) {
+      String key = text(item.get("key"), null);
+      if (!notBlank(key)) continue;
+      filters.add(new Filter(
+          key, text(item.get("op"), "eq"),
+          QueryEngine.resolveValue(item.get("value")),
+          QueryEngine.resolveValue(item.get("value2"))));
+    }
+    return List.copyOf(filters);
+  }
+
+  private static List<Filter> concatFilters(List<Filter> filters, Filter extra) {
+    List<Filter> combined = new ArrayList<>(filters);
+    combined.add(extra);
+    return List.copyOf(combined);
   }
 
   /** 仪表盘：读绑定指标的最新值与目标值。 */

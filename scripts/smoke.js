@@ -112,6 +112,15 @@ async function main() {
     const repVal = rep.data.data.data.rawValue;
     const gmVal = gm.data.data.data.rawValue;
     ok('销售代表卡片只统计本人数据', repVal > 0 && repVal < gmVal, `本人 ${repVal} < 全局 ${gmVal}`);
+
+    const pool = await call('/api/dashboard/widget/w_card_lead_pool', {}, sessions.rep01.token);
+    ok('普通角色线索池卡片可按未展示的数据集字段筛选',
+      pool.status === 200 && pool.data.data.ok && Number.isFinite(Number(pool.data.data.data.rawValue)),
+      pool.data.message || `待领取 ${pool.data.data.data.rawValue}`);
+    const pending = await call('/api/dashboard/widget/w_card_pending_order', {}, sessions.dir01.token);
+    ok('销售总监待付款卡片可按报表维度筛选',
+      pending.status === 200 && pending.data.data.ok && Number.isFinite(Number(pending.data.data.data.rawValue)),
+      pending.data.message || `待付款 ${pending.data.data.data.rawValue}`);
   }
   {
     const cases = ['w_chart_region_rank', 'w_chart_sales_trend', 'w_chart_industry_pie', 'w_chart_funnel', 'w_chart_heatmap', 'w_chart_product_stack', 'w_chart_scatter', 'w_chart_radar', 'w_chart_gauge', 'w_chart_order_status', 'w_chart_lead_source', 'w_chart_top_customer', 'w_chart_rep_rank', 'w_chart_month_trend', 'w_chart_lead_convert_trend', 'w_chart_customer_trend'];

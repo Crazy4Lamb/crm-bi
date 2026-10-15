@@ -332,7 +332,25 @@ public class QueryEngine {
   /** 按报表执行查询（走报表字段设计，含自定义字段）。 */
   public Result queryReport(int reportId, Request request) {
     Dataset dataset = datasetOfReport(reportId);
-    List<Field> fields = reportFields(reportId);
+    List<Field> fields = new ArrayList<>(reportFields(reportId));
+
+    /*
+     * 组件和报表可以用数据集字段做筛选，即使该字段没有作为展示列加入报表。
+     * 这里只补充 WHERE 所需字段；维度和度量仍必须来自报表设计，避免调用方
+     * 绕过报表字段白名单读取未配置的列。
+     */
+    Set<String> existing = fields.stream().map(Field::key)
+        .collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
+    Set<String> filterKeys = request.filters().stream()
+        .filter(java.util.Objects::nonNull)
+        .map(Filter::fieldKey)
+        .filter(QueryEngine::notBlank)
+        .collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
+    if (!filterKeys.isEmpty()) {
+      datasetFields(dataset.id()).stream()
+          .filter(field -> filterKeys.contains(field.key()) && existing.add(field.key()))
+          .forEach(fields::add);
+    }
     return run(dataset, expressions(dataset, fields), fields, request);
   }
 
